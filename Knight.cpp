@@ -1,5 +1,3 @@
-#ifndef KING_H
-#define KING_H
 
 //INCOMPLETE
 class Knight {
@@ -10,4 +8,3 @@ class Knight {
         void validMoves(); //not sure what type we want this to be yet.
 };
 
-#endifs
