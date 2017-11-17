@@ -22,6 +22,11 @@ Pawn::Pawn(char col, int row, bool isWhite) {
 }
 
 void Pawn::validMoves() {
-    //TODO
+    //TODO, we can do this in board maybe
+}
+
+void Pawn::move(char col, int row) {
+    this->col = col;
+    this->row = row;
 }
 

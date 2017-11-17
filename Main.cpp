@@ -23,3 +23,8 @@ boolean checkValidMove() {
 int main() {
 
 }
+
+
+for (int i = 1; i <= 10, i++) {
+    values[i] = i;
+}
