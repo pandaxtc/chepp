@@ -5,26 +5,24 @@ Pawn::Pawn(bool isWhite) : Piece(isWhite) {
     m_firstMove = true;
 }
 
-bool Pawn::checkMove(int newX, int newY, int curX, int curY, Board& board)
+void Pawn::checkMove(int curX, int curY, Square* board[BOARD_SIZE][BOARD_SIZE])
 {
-    if (isWithinBounds(newX, newY))
+    Square* cur = cur;
+    int dir = (m_isWhite) ? 1 : -1; //if white go up else go down
+    if (!board[curY + dir][curX]->getPiece())
     {
-        if (newX == curX)
-        {
-            if (newY == curY + 1)
-            {
-                m_firstMove = false;
-                return true;
-            }
-            else if (newY == curY + 2 && m_firstMove)
-            {
-                m_firstMove = false;
-                return true;
-            }
-            else
-                return false;
-        }
-        else
-            return false;
+        board[curY + dir][curX]->inDangerFrom.insert(cur);
+    }
+    if (m_firstMove && !board[curY + dir*2][curX]->getPiece())
+    {
+        board[curY + dir*2][curX]->inDangerFrom.insert(cur);
+    }
+    if (curX != 7 && board[curY + dir][curX + 1]->getPiece())
+    {
+        board[curY + dir][curX + 1]->inDangerFrom.insert(cur);
+    }
+    if (curX != 0 && board[curY + dir][curX - 1]->getPiece())
+    {
+        board[curY + dir][curX - 1]->inDangerFrom.insert(cur);
     }
 };

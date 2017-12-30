@@ -13,7 +13,7 @@ void Bishop::checkMove(int curX, int curY, Square* board[BOARD_SIZE][BOARD_SIZE]
         {
             if (board[tmpY][tmpX]->getPiece()->m_isWhite != cur->getPiece()->m_isWhite)
             {
-                board[tmpY][tmpX]->inDangerFrom.insert(board[curX][curY]);
+                board[tmpY][tmpX]->inDangerFrom.insert(cur);
             }
             break;
         }
