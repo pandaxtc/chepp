@@ -1,8 +1,9 @@
 #include "piece.h"
 
-bool Queen::checkMove(int newX, int newY, int curX, int curY)
+void Queen::checkMove(int curX, int curY, Square* board[BOARD_SIZE][BOARD_SIZE])
 {
-    if (isWithinBounds(newX, newY))
+    /*
+    if (isWithinBounds(curX, newY))
     {
         if (curY - newY == curX - newX)
         {
@@ -13,4 +14,5 @@ bool Queen::checkMove(int newX, int newY, int curX, int curY)
             return true;
         }
     }
+     */
 }
