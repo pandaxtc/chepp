@@ -7,48 +7,61 @@ using namespace std;
 class Piece
 {
 public:
-    Piece(bool isWhite) {
+    Piece(bool isWhite)
+    {
         m_isWhite = isWhite;
     }
-    virtual bool checkMove(int posX, int posY, int curX, int curY) = 0;
+
+    virtual bool checkMove(int newX, int newY, int curX, int curY) = 0;
     bool m_isWhite;
+    bool isWithinBounds(int posX, int posY)
+    {
+        if (posX < 8 && posY < 8 && posX > 0 && posY > 0) return true;
+        else return false;
+    }
 };
 
-class Pawn : public Piece {
+class Pawn : public Piece
+{
 public:
     Pawn(bool isWhite);
-    bool checkMove(int posX, int posY, int curX, int curY) override;
+    bool checkMove(int newX, int newY, int curX, int curY) override;
     bool m_firstMove;
 };
 
-class King : public Piece {
+class King : public Piece
+{
 public:
-    King(bool isWhite);
-    bool checkMove(int posX, int posY, int curX, int curY) override;
+    using Piece::Piece;
+    bool checkMove(int newX, int newY, int curX, int curY) override;
 };
 
-class Queen : public Piece {
+class Queen : public Piece
+{
 public:
-    Queen(bool isWhite);
-    bool checkMove(int posX, int posY, int curX, int curY) override;
+    using Piece::Piece;
+    bool checkMove(int newX, int newY, int curX, int curY) override;
 };
 
-class Bishop : public Piece {
+class Bishop : public Piece
+{
 public:
-    Bishop(bool isWhite);
-    bool checkMove(int posX, int posY, int curX, int curY) override;
+    using Piece::Piece;
+    bool checkMove(int newX, int newY, int curX, int curY) override;
 };
 
-class Knight : public Piece {
+class Knight : public Piece
+{
 public:
-    Knight(bool isWhite);
-    bool checkMove(int posX, int posY, int curX, int curY) override;
+    using Piece::Piece;
+    bool checkMove(int newX, int newY, int curX, int curY) override;
 };
 
-class Rook : public Piece {
+class Rook : public Piece
+{
 public:
-    Rook(bool isWhite);
-    bool checkMove(int posX, int posY, int curX, int curY) override;
+    using Piece::Piece;
+    bool checkMove(int newX, int newY, int curX, int curY) override;
 };
 
 #endif //CHEPP_PIECE_H
