@@ -3,6 +3,7 @@
 
 Pawn::Pawn(bool isWhite) : Piece(isWhite) {
     m_firstMove = true;
+    type = pawn;
 }
 
 void Pawn::checkMove(int curX, int curY, Square* board[BOARD_SIZE][BOARD_SIZE])

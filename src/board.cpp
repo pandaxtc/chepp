@@ -1,4 +1,5 @@
 #include "board.h"
+#include "piece.h"
 #define IS_WHITE true
 #define IS_BLACK false
 

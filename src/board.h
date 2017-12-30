@@ -2,10 +2,11 @@
 #define CHEPP_BOARD_H
 #define BOARD_SIZE 8
 
-#include "piece.h"
 #include <unordered_set>
 
 using namespace std;
+
+class Piece;
 
 struct Square {
 public:
@@ -24,7 +25,7 @@ public:
     Board();
     void initBoard();
     void updateDanger();
-private:
+    Square** getBoardState();
     //board[y][x]
     Square* board[BOARD_SIZE][BOARD_SIZE];
 };
