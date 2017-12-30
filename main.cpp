@@ -75,8 +75,8 @@ int main()
         cin >> input; //notation: a6-a7 (move from a6 to a7) OR a6 a7 with any number of spaces in between OR a6 - a7 with any number of spaces in between
         if (input == "exit") exit(1);
         while (1) {
-            if (!regex_match(input, r) || board->board[(input[0] - 'H' <= 0) ? input[0] - 'A' : input[0] - 'a'][(int)input[2]]->getPiece()->m_isWhite != whiteTurn) {
-                //check if regex matches and moving piece is of right color
+            if (!regex_match(input, r) || board->board[(int)input[1] - 1][(input[0] - 'H' <= 0) ? input[0] - 'A' : input[0] - 'a']->getPiece() == NULL) {
+                //check if regex matches and if there is a piece on specified location
                 //R E A D A B I L I T Y B O Y S
                 cout << "Invalid input, please try again." << endl;
                 cin >> input;
@@ -85,15 +85,20 @@ int main()
                 break;
             }
         }
-
+        if (board->board[(int)input[1] - 1][(input[0] - 'H' <= 0) ? input[0] - 'A' : input[0] - 'a']->getPiece()->m_isWhite != whiteTurn) {
+            //check if and moving piece is of right color
+            cout << "Wrong color" << endl;
+        }
         //parsing input
-        Square* from = board->board[(input[0] - 'H' <= 0) ? input[0] - 'A' : input[0] - 'a'][(int)input[2]];
-        Square* to = board->board[(input[input.size() - 1] - 'H' <= 0) ? input[input.size() - 1] - 'A' : input[input.size() - 1] - 'a'][(int)input[input.size()]];
-        unordered_set::const_iterator got = to->inDangerFrom.find(from);
+        Square* from = board->board[(int)input[1] - 1][(input[0] - 'H' <= 0) ? input[0] - 'A' : input[0] - 'a'];
+        Square* to = board->board[(int)input[input.size()]][(input[input.size() - 1] - 'H' <= 0) ? input[input.size() - 1] - 'A' : input[input.size() - 1] - 'a'];
+        unordered_set<Square*>::const_iterator got = to->inDangerFrom.find(from);
         if (got == to->inDangerFrom.end()) {
-            //Print error message and go back to cin!
+            //TODO Print error message and go back to cin!
+            cout << "Invalid input, please try again." << endl;
         } else {
-            //MOVE THE PIECE
+            //TODO MOVE THE PIECE
+            cout << "Yay!" << endl;
         }
 
 
