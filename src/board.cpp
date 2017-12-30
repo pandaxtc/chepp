@@ -66,26 +66,15 @@ void Board::updateDanger() { //Update board danger.
     }
 
     //Iterate over all pieces
-    //i: y, j: x
+    //i: y, j: xas
     for (int i = 0; i < BOARD_SIZE; i++)
     {
         for (int j = 0; j < BOARD_SIZE; j++)
         {
-            if (board[i][j]->getPiece()) { //If piece is present on current square, check danger.
-                Square* s = board[i][j];
-
-                //Iterate over board again to update squares in danger from this piece.
-                // k: y, m: x
-                for (int k = 0; k < BOARD_SIZE; k++)
-                {
-                    for (int m = 0; m < BOARD_SIZE; m++)
-                    {
-                        if (s->getPiece()->checkMove(k, m, i, j)) //If piece can legally move here, update danger.
-                        {
-                            board[k][m]->inDangerFrom.insert(s);
-                        }
-                    }
-                }
+            if (board[i][j]->getPiece())
+            {
+                Piece* p = board[i][j]->getPiece();
+                p->checkMove(j ,i, board);
             }
         }
     }

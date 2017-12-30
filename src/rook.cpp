@@ -1,11 +1,9 @@
 #include "piece.h"
 
-bool Rook::checkMove(int newX, int newY, int curX, int curY)
+bool Rook::checkMove(int newX, int newY, int curX, int curY, Board& board)
 {
-    if (newX == curX && newY == curY)
-    {
-        return true;
+    if (newX == curX && newY == curY) {
+
     }
-    else
-        return false;
+
 }

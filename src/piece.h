@@ -14,7 +14,7 @@ public:
         m_isWhite = isWhite;
     }
 
-    virtual bool checkMove(int newX, int newY, int curX, int curY) = 0;
+    virtual bool checkMove(int curX, int curY, Square* board[BOARD_SIZE][BOARD_SIZE]) = 0;
     bool m_isWhite;
     bool isWithinBounds(int posX, int posY)
     {
@@ -27,7 +27,7 @@ class Pawn : public Piece
 {
 public:
     Pawn(bool isWhite);
-    bool checkMove(int newX, int newY, int curX, int curY) override;
+    bool checkMove(int curX, int curY, Square* board[BOARD_SIZE][BOARD_SIZE]) override;
     bool m_firstMove;
 };
 
@@ -35,35 +35,35 @@ class King : public Piece
 {
 public:
     using Piece::Piece;
-    bool checkMove(int newX, int newY, int curX, int curY) override;
+    bool checkMove(int curX, int curY, Square* board[BOARD_SIZE][BOARD_SIZE]) override;
 };
 
 class Queen : public Piece
 {
 public:
     using Piece::Piece;
-    bool checkMove(int newX, int newY, int curX, int curY) override;
+    bool checkMove(int curX, int curY, Square* board[BOARD_SIZE][BOARD_SIZE]) override;
 };
 
 class Bishop : public Piece
 {
 public:
     using Piece::Piece;
-    void checkMove(int curx, int cury, Square* squares[8][8]);
+    bool checkMove(int curX, int curY, Square* board[BOARD_SIZE][BOARD_SIZE]) override;
 };
 
 class Knight : public Piece
 {
 public:
     using Piece::Piece;
-    bool checkMove(int newX, int newY, int curX, int curY) override;
+    bool checkMove(int curX, int curY, Square* board[BOARD_SIZE][BOARD_SIZE]) override;
 };
 
 class Rook : public Piece
 {
 public:
     using Piece::Piece;
-    bool checkMove(int newX, int newY, int curX, int curY) override;
+    bool checkMove(int curX, int curY, Square* board[BOARD_SIZE][BOARD_SIZE]) override;
 };
 
 #endif //CHEPP_PIECE_H

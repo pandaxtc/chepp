@@ -1,52 +1,62 @@
 #include "piece.h"
-#include "board.h"
 
-void Bishop::checkMove(int curx, int cury, Square* squares[8][8])
+void Bishop::checkMove(int curX, int curY, Square* board[BOARD_SIZE][BOARD_SIZE])
 {
-    int tempx = curx;
-    int tempy = cury;
-    while (tempx < 8 && tempy < 8) { //up right
-        tempx++;
-        tempy++;
-        if (!squares[tempy][tempx]->getPiece()) {
-            if (squares[tempy][tempx]->getPiece()->m_isWhite != squares[cury][curx]->getPiece()->m_isWhite) {
-                squares[tempy][tempx]->inDangerFrom.insert(squares[curx][cury]);
+    int tmpX = curX;
+    int tmpY = curY;
+    Square* cur = cur;
+    while (tmpX < 8 && tmpY < 8) //up right
+    {
+        tmpX++;
+        tmpY++;
+        if (!board[tmpY][tmpX]->getPiece())
+        {
+            if (board[tmpY][tmpX]->getPiece()->m_isWhite != cur->getPiece()->m_isWhite)
+            {
+                board[tmpY][tmpX]->inDangerFrom.insert(board[curX][curY]);
             }
             break;
         }
     }
-    tempx = curx;
-    tempy = cury;
-    while (tempx >= 0 && tempy < 8) { //up left
-        tempx--;
-        tempy++;
-        if (!squares[tempy][tempx]->getPiece()) {
-            if (squares[tempy][tempx]->getPiece()->m_isWhite != squares[cury][curx]->getPiece()->m_isWhite) {
-                squares[tempy][tempx]->inDangerFrom.insert(squares[curx][cury]);
+    tmpX = curX;
+    tmpY = curY;
+    while (tmpX >= 0 && tmpY < 8)
+    { //up left
+        tmpX--;
+        tmpY++;
+        if (!board[tmpY][tmpX]->getPiece())
+        {
+            if (board[tmpY][tmpX]->getPiece()->m_isWhite != cur->getPiece()->m_isWhite)
+            {
+                board[tmpY][tmpX]->inDangerFrom.insert(cur);
             }
             break;
         }
     }
-    tempx = curx;
-    tempy = cury;
-    while (tempx >= 0 && tempy >= 0) { //down left
-        tempx--;
-        tempy--;
-        if (!squares[tempy][tempx]->getPiece()) {
-            if (squares[tempy][tempx]->getPiece()->m_isWhite != squares[cury][curx]->getPiece()->m_isWhite) {
-                squares[tempy][tempx]->inDangerFrom.insert(squares[curx][cury]);
+    tmpX = curX;
+    tmpY = curY;
+    while (tmpX >= 0 && tmpY >= 0) { //down left
+        tmpX--;
+        tmpY--;
+        if (!board[tmpY][tmpX]->getPiece())
+        {
+            if (board[tmpY][tmpX]->getPiece()->m_isWhite != cur->getPiece()->m_isWhite)
+            {
+                board[tmpY][tmpX]->inDangerFrom.insert(cur);
             }
             break;
         }
     }
-    tempx = curx;
-    tempy = cury;
-    while (tempx < 8 && tempy >= 0) { //down right
-        tempx++;
-        tempy--;
-        if (!squares[tempy][tempy]->getPiece()) {
-            if (squares[tempy][tempx]->getPiece()->m_isWhite != squares[cury][curx]->getPiece()->m_isWhite) {
-                squares[tempy][tempx]->inDangerFrom.insert(squares[curx][cury]);
+    tmpX = curX;
+    tmpY = curY;
+    while (tmpX < 8 && tmpY >= 0) { //down right
+        tmpX++;
+        tmpY--;
+        if (!board[tmpY][tmpY]->getPiece())
+        {
+            if (board[tmpY][tmpX]->getPiece()->m_isWhite != cur->getPiece()->m_isWhite)
+            {
+                board[tmpY][tmpX]->inDangerFrom.insert(cur);
             }
             break;
         }

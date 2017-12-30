@@ -1,10 +1,11 @@
 #include "piece.h"
+#include "board.h"
 
 Pawn::Pawn(bool isWhite) : Piece(isWhite) {
     m_firstMove = true;
 }
 
-bool Pawn::checkMove(int newX, int newY, int curX, int curY)
+bool Pawn::checkMove(int newX, int newY, int curX, int curY, Board& board)
 {
     if (isWithinBounds(newX, newY))
     {
