@@ -2,6 +2,8 @@
 #define CHEPP_PIECE_H
 
 #include <cstdlib>
+#include "board.h"
+
 using namespace std;
 
 class Piece
@@ -47,7 +49,7 @@ class Bishop : public Piece
 {
 public:
     using Piece::Piece;
-    bool checkMove(int newX, int newY, int curX, int curY) override;
+    void checkMove(int curx, int cury, Square* squares[8][8]);
 };
 
 class Knight : public Piece

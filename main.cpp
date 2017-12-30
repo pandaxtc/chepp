@@ -1,10 +1,9 @@
 #include <cstdlib>
-#include "board.h"
+#include "src/board.h"
 
 using namespace std;
 
 int main()
 {
     auto * board = new Board();
-    board->initBoard();
 }
