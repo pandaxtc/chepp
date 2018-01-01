@@ -6,103 +6,183 @@
 
 using namespace std;
 
-
+void printBoard(Board* board);
+void printDanger(Board* board);
 
 int main()
 {
-    Board* board = new Board();
-    bool whiteTurn = true;
+    //Game p_squares initialization
+    auto * board = new Board();
+    bool isWhiteTurn = false;
+
+    //Regex for move notation: <letter><number><spaces><optional '-'><spaces><letter><number>
+    regex rgx1(R"(^([a-hA-H][1-8])\s*-?\s*([a-hA-H][1-8])\s*$)");
+
+    //Primary game loop
     while (true)
     {
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
-                if (board->board[i][j]->getPiece()) {
-                    Square *cur = board->board[i][j];
-                    piece_t type = cur->getPiece()->type;
-                    if (cur->getPiece()->m_isWhite) {
-                        switch (type) {
-                            case pawn :
-                                cout << "♟";
-                                break;
-                            case rook :
-                                cout << "♜";
-                                break;
-                            case knight :
-                                cout << "♞";
-                                break;
-                            case bishop :
-                                cout << "♝";
-                                break;
-                            case queen :
-                                cout << "♛";
-                                break;
-                            case king :
-                                cout << "♚";
-                                break;
-                            default :
-                                cout << "..  ";
-                        }
-                    } else {
-                        switch (type) {
-                            case pawn :
-                                cout << "♙";
-                                break;
-                            case rook :
-                                cout << "♖";
-                                break;
-                            case knight :
-                                cout << "♘";
-                                break;
-                            case bishop :
-                                cout << "♗";
-                                break;
-                            case queen :
-                                cout << "♕";
-                                break;
-                            case king :
-                                cout << "♔";
-                                break;
-                            default :
-                                cout << "..  ";
-                        }
+        printBoard(board);
+        isWhiteTurn = !isWhiteTurn;
+
+        //Prompt user for input.
+        cout << "> ";
+        string input;
+
+        //Check for input validity
+        bool isValid = false;
+        while (!isValid)
+        {
+            cin >> input;
+            //Semantic validity
+            cout << "RECEIVED INPUT " << input << endl;
+            cout << "TESTING SEMANTIC VALIDITY..." << endl;
+
+            smatch sm;
+
+            if (input == "exit")
+            {
+                exit(1);
+            }
+            else if (!regex_match(input, sm, rgx1))
+            {
+                cout << "Invalid input, please try again." << endl << "> ";
+            }
+            else {
+                cout << "SEMANTICALLY VALID!" << endl;
+                //Logical validity
+                /* backup regexer
+                regex rgx2("([a-hA-H])([1-8])");
+                sregex_iterator match(input.begin(), input.end(), rgx2);
+                int posX = match->[0];
+                int posY = match->[1];
+                match++;
+                int newX = match->[0];
+                int newY = match->[1];
+                */
+                cout << "TESTING LOGICAL VALIDITY..." << endl;
+                int posX = tolower(sm.str(1)[0]) - 'a';
+                int posY = tolower(sm.str(1)[1]) - '1';
+                int newX = tolower(sm.str(2)[0]) - 'a';
+                int newY = tolower(sm.str(2)[1]) - '1';
+                cout << posX << ", " << posY << endl;
+                cout << newX << ", " << newY << endl;
+                if (!board->p_squares[posY][posX]->hasPiece()) {
+                    cout << "No piece on square " << input.substr(0, 1) << ", please try again." << endl << "> ";
+                }
+                else if (board->p_squares[posY][posX]->getPiece()->isWhite != isWhiteTurn) {
+                    cout << "Incorrect piece color, please try again." << endl << "> ";
+                }
+                else {
+                    //Move validity
+                    cout << "LOGICALLY VALID!" << endl;
+                    cout << "TESTING MOVE VALIDITY..." << endl;
+                    ///* debug statements
+                    cout << "POINTERS ON NEW SQUARE: " << endl;
+                    for (Square* s : board->p_squares[newY][newX]->inDangerFrom) {
+                        cout << s << endl;
+                    }
+                    cout << "CURRENT SQUARE POINTER:" << board->p_squares[posY][posX] << endl;
+                    //*/
+                    if (board->p_squares[newY][newX]->inDangerFrom.count(board->p_squares[posY][posX]) == 0) {
+                        cout << "Invalid move, please try again." << endl << "> ";
+                    }
+                    else
+                    {
+                        cout << "MOVE VALID!" << endl;
+                        board->move(posX, posY, newX, newY);
+                        isValid = true;
                     }
                 }
             }
-            cout << endl;
         }
-        regex r("([a-h]|[A-H])[1-8]\\s*+-?\\s*+([a-h]|[A-H])[1-8]"); //regex is love regex is life
-        string input;
-        cin >> input; //notation: a6-a7 (move from a6 to a7) OR a6 a7 with any number of spaces in between OR a6 - a7 with any number of spaces in between
-        if (input == "exit") exit(1);
-        while (1) {
-            if (!regex_match(input, r) || board->board[(int)input[1] - 1][(input[0] - 'H' <= 0) ? input[0] - 'A' : input[0] - 'a']->getPiece() == NULL) {
-                //check if regex matches and if there is a piece on specified location
-                //R E A D A B I L I T Y B O Y S
-                cout << "Invalid input, please try again." << endl;
-                cin >> input;
-                if (input == "exit") exit(1);
-            } else {
-                break;
+
+        board->updateDanger();
+
+    }
+
+}
+
+//Outputs p_squares
+void printBoard(Board* board)
+{
+    for (int i = BOARD_SIZE - 1; i >= 0; i--)
+    {
+        for (auto &j : board->p_squares[i])
+        {
+            if (j->hasPiece())
+            {
+                Square *cur = j;
+                piece_t type = cur->getPiece()->type;
+
+                if (cur->getPiece()->isWhite) {
+                    switch (type) {
+                        case pawn :
+                            cout << "♟";
+                            break;
+                        case rook :
+                            cout << "♜";
+                            break;
+                        case knight :
+                            cout << "♞";
+                            break;
+                        case bishop :
+                            cout << "♝";
+                            break;
+                        case queen :
+                            cout << "♛";
+                            break;
+                        case king :
+                            cout << "♚";
+                            break;
+                    }
+                } else {
+                    switch (type) {
+                        case pawn :
+                            cout << "♙";
+                            break;
+                        case rook :
+                            cout << "♖";
+                            break;
+                        case knight :
+                            cout << "♘";
+                            break;
+                        case bishop :
+                            cout << "♗";
+                            break;
+                        case queen :
+                            cout << "♕";
+                            break;
+                        case king :
+                            cout << "♔";
+                            break;
+                    }
+                }
+            }
+            else {
+                cout << "\u2001";
             }
         }
-        if (board->board[(int)input[1] - 1][(input[0] - 'H' <= 0) ? input[0] - 'A' : input[0] - 'a']->getPiece()->m_isWhite != whiteTurn) {
-            //check if and moving piece is of right color
-            cout << "Wrong color" << endl;
-        }
-        //parsing input
-        Square* from = board->board[(int)input[1] - 1][(input[0] - 'H' <= 0) ? input[0] - 'A' : input[0] - 'a'];
-        Square* to = board->board[(int)input[input.size()]][(input[input.size() - 1] - 'H' <= 0) ? input[input.size() - 1] - 'A' : input[input.size() - 1] - 'a'];
-        unordered_set<Square*>::const_iterator got = to->inDangerFrom.find(from);
-        if (got == to->inDangerFrom.end()) {
-            //TODO Print error message and go back to cin!
-            cout << "Invalid input, please try again." << endl;
-        } else {
-            //TODO MOVE THE PIECE
-            cout << "Yay!" << endl;
-        }
+        cout << endl;
+    }
+    printDanger(board);
+}
 
-
-        //TODO implement moving!
-        break; //for debug purposes
+//Outputs danger
+void printDanger(Board* board)
+{
+    for (auto &i : board->p_squares)
+    {
+        for (auto &j : i)
+        {
+            Square* cur = j;
+            bool inDanger = (cur->inDangerFrom.empty());
+            if (inDanger)
+            {
+                cout << "x ";
+            }
+            else cout << "o ";
+        }
+        cout << endl;
     }
 }
+

@@ -16,4 +16,5 @@ set (SOURCE_FILES
         src/bishop.cpp
         )
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 add_executable(chepp main.cpp ${SOURCE_FILES})

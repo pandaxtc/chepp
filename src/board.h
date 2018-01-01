@@ -6,28 +6,37 @@
 
 using namespace std;
 
-class Piece;
+class Piece; //Forward declaration
 
-struct Square {
+//Board contains Square contains Piece
+
+struct Square
+{
 public:
+    const int posX;
+    const int posY;
+    unordered_set<Square*> inDangerFrom;
+
     Square(int posX, int posY);
     void moveHere(Piece* piece);
     Piece* getPiece();
-    unordered_set<Square*> inDangerFrom;
-    const int m_posX;
-    const int m_posY;
+    bool hasPiece();
 private:
-    Piece* m_piece;
+    Piece* m_piece = nullptr;
 };
 
-class Board {
+class Board
+{
 public:
+    //p_squares[y][x]
+    Square* p_squares[BOARD_SIZE][BOARD_SIZE];
+    unordered_set<Piece*> p_takenPieces;
+
     Board();
     void initBoard();
     void updateDanger();
-    Square** getBoardState();
-    //board[y][x]
-    Square* board[BOARD_SIZE][BOARD_SIZE];
+    void move(int posX, int posY, int newX, int newY);
+
 };
 
 
