@@ -27,8 +27,8 @@ SOFTWARE.
 
 Knight::Knight(bool isWhite) : Piece(isWhite, knight) {}
 
-void move(int x, int y, Square* cur, Square* board[BOARD_SIZE][BOARD_SIZE])
-{
+void Knight::move(int x, int y, Square* board[BOARD_SIZE][BOARD_SIZE]) {
+    Square* cur = board[posY][posX];
     if (x >= 0 && x < 8 && y >= 0 && y < 8) {
         bool hasPiece = board[y][x]->hasPiece();
         if (hasPiece && board[y][x]->getPiece()->isWhite != cur->getPiece()->isWhite) {
@@ -39,15 +39,13 @@ void move(int x, int y, Square* cur, Square* board[BOARD_SIZE][BOARD_SIZE])
     }
 }
 
-void Knight::checkMove(int curX, int curY, Square* board[BOARD_SIZE][BOARD_SIZE])
-{
-    Square* cur = board[curY][curX];
-    move(curX + 1, curY + 2, cur, board);
-    move(curX - 1, curY + 2, cur, board);
-    move(curX - 2, curY + 1, cur, board);
-    move(curX - 2, curY - 1, cur, board);
-    move(curX - 1, curY - 2, cur, board);
-    move(curX + 1, curY - 2, cur, board);
-    move(curX + 2, curY - 1, cur, board);
-    move(curX + 2, curY + 1, cur, board);
+void Knight::markDanger(Square* board[BOARD_SIZE][BOARD_SIZE]) {
+    move(posX + 1, posY + 2, board);
+    move(posX - 1, posY + 2, board);
+    move(posX - 2, posY + 1, board);
+    move(posX - 2, posY - 1, board);
+    move(posX - 1, posY - 2, board);
+    move(posX + 1, posY - 2, board);
+    move(posX + 2, posY - 1, board);
+    move(posX + 2, posY + 1, board);
 }
