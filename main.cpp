@@ -38,7 +38,6 @@ int main()
             cout << "TESTING SEMANTIC VALIDITY..." << endl;
 
             smatch sm;
-
             if (input == "exit")
             {
                 exit(1);
@@ -170,9 +169,9 @@ void printBoard(Board* board)
 //Outputs danger
 void printDanger(Board* board)
 {
-    for (auto &i : board->p_squares)
+    for (int i = BOARD_SIZE - 1; i >= 0; i--)
     {
-        for (auto &j : i)
+        for (auto &j : board->p_squares[i])
         {
             Square* cur = j;
             bool inDanger = (cur->inDangerFrom.empty());
