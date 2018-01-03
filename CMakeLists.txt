@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.5)
 project(chepp)
 
 set(CMAKE_CXX_STANDARD 11)
 
 include_directories(${PROJECT_SOURCE_DIR}/src)
-set (SOURCE_FILES
+set(SOURCE_FILES
         src/board.h
         src/board.cpp
         src/piece.h
