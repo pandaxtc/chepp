@@ -71,6 +71,7 @@ void Board::initBoard() {
         p->moveHere(new Pawn(IS_BLACK));
     }
     // Populate other pieces
+    /*
     p_squares[0][0]->moveHere(new Rook(IS_WHITE));
     p_squares[0][1]->moveHere(new Knight(IS_WHITE));
     p_squares[0][2]->moveHere(new Bishop(IS_WHITE));
@@ -88,6 +89,8 @@ void Board::initBoard() {
     p_squares[7][5]->moveHere(new Bishop(IS_BLACK));
     p_squares[7][6]->moveHere(new Knight(IS_BLACK));
     p_squares[7][7]->moveHere(new Rook(IS_BLACK));
+    */
+    p_squares[6][0]->moveHere(new Pawn(IS_WHITE));
 }
 
 void Board::updateDanger() { // Update board danger markers
@@ -169,5 +172,40 @@ Square* Board::isCheckmate() {
         } else {
             return nullptr;
         }
+    }
+}
+
+bool Board::canPromote(bool isWhiteTurn) {
+    if (isWhiteTurn) {
+        for (auto &square : p_squares[BOARD_SIZE - 1]) {
+            if (square->hasPiece() && square->getPiece()->isWhite && square->getPiece()->type == pawn) {
+                return true;
+            }
+        }
+    } else {
+        for (auto &square : p_squares[0]) {
+            if (square->hasPiece() && !square->getPiece()->isWhite && square->getPiece()->type == pawn) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void Board::promote(int posX, int posY, int input) {
+    bool isWhite = p_squares[posY][posX]->getPiece()->isWhite;
+    switch (input) {
+        case ('q') :
+            p_squares[posY][posX]->moveHere(new Queen(isWhite));
+            break;
+        case ('r') :
+            p_squares[posY][posX]->moveHere(new Rook(isWhite));
+            break;
+        case ('b') :
+            p_squares[posY][posX]->moveHere(new Bishop(isWhite));
+            break;
+        case ('k') :
+            p_squares[posY][posX]->moveHere(new Knight(isWhite));
+            break;
     }
 }

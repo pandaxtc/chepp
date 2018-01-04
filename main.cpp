@@ -48,6 +48,7 @@ int main() {
 
     ///Regex for move notation: <letter><number><spaces><optional '-'><spaces><letter><number>
     regex rgx1(R"(^([a-hA-H][1-8])\s*-?\s*([a-hA-H][1-8])\s*$)");
+    regex rgx2(R"(^([Q,R,B,K,q,r,b,k])");
 
     //Primary game loop
     while (true) {
@@ -59,6 +60,9 @@ int main() {
 
         //Check for input validity
         bool isValid = false;
+        //declared newX and NewY outside to make promotion easier
+        int newX = 0;
+        int newY = 0;
         while (!isValid) {
             Square* p = board->isCheckmate(); // Check for checkmate
             if (p) {
@@ -82,8 +86,8 @@ int main() {
                 cout << "TESTING LOGICAL VALIDITY..." << endl;
                 int posX = tolower(sm.str(1)[0]) - 'a';
                 int posY = tolower(sm.str(1)[1]) - '1';
-                int newX = tolower(sm.str(2)[0]) - 'a';
-                int newY = tolower(sm.str(2)[1]) - '1';
+                newX = tolower(sm.str(2)[0]) - 'a';
+                newY = tolower(sm.str(2)[1]) - '1';
                 cout << posX << ", " << posY << endl;
                 cout << newX << ", " << newY << endl;
                 if (!board->p_squares[posY][posX]->hasPiece()) {
@@ -103,7 +107,16 @@ int main() {
                 }
             }
         }
-
+        if (board->canPromote(isWhiteTurn)) {
+            cout << "Promote to what piece?" << endl;
+            cout << "(Q)ueen (R)ook (B)ishop (K)night" << endl;
+            cin >> input;
+            while (!regex_match(input, rgx2)) {
+                cout << "Invalid input, please try again." << endl;
+                cin >> input;
+            }
+            board->promote(newX, newY, tolower(input[0]));
+        }
         board->updateDanger();
 
     }

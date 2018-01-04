@@ -70,7 +70,13 @@ public:
 
     void updateDanger();
 
+    bool canPromote(bool isWhiteTurn);
+
+    void promote(int posX, int posY, int input);
+
     bool move(int posX, int posY, int newX, int newY);
+
+
 
     Square* isCheckmate();
 };
