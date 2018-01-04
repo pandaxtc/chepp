@@ -36,7 +36,7 @@ void Pawn::markDanger(Square* board[BOARD_SIZE][BOARD_SIZE]) {
     if (!board[posY + dir][posX]->hasPiece()) {
         board[posY + dir][posX]->inDangerFrom.insert(cur);
         //If is first move and 2 spaces forwards are both empty, mark square 2 spaces forwards as in danger from cur
-        if (posY + dir * 2 < 8 && posY + dir * 2 >= 0 && !board[posY + dir * 2][posX]->hasPiece()) {
+        if (posY + dir * 2 < 8 && posY + dir * 2 >= 0 && firstMove && !board[posY + dir * 2][posX]->hasPiece()) {
             board[posY + dir * 2][posX]->inDangerFrom.insert(cur); // Mark square as in danger from cur
         }
     }
