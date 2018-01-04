@@ -92,7 +92,7 @@ struct Pawn : public Piece {
 public:
     explicit Pawn(bool isWhite);
 
-    void markDanger(Square* board[BOARD_SIZE][BOARD_SIZE]) override;
+    void markDanger(Square *board[BOARD_SIZE][BOARD_SIZE]) override;
 };
 
 /**
@@ -103,7 +103,7 @@ struct King : public Piece {
 public:
     explicit King(bool isWhite);
 
-    void markDanger(Square* board[BOARD_SIZE][BOARD_SIZE]) override;
+    void markDanger(Square *board[BOARD_SIZE][BOARD_SIZE]) override;
 
 };
 
@@ -115,7 +115,7 @@ struct Bishop : public Piece {
 public:
     explicit Bishop(bool isWhite);
 
-    void markDanger(Square* board[BOARD_SIZE][BOARD_SIZE]) override;
+    void markDanger(Square *board[BOARD_SIZE][BOARD_SIZE]) override;
 };
 
 /**
@@ -123,10 +123,13 @@ public:
  * @brief Represents Knight piece.
  */
 struct Knight : public Piece {
+private:
+    bool checkKnightMove(int newX, int newY, Square* board[BOARD_SIZE][BOARD_SIZE]);
+
 public:
     explicit Knight(bool isWhite);
 
-    void markDanger(Square* board[BOARD_SIZE][BOARD_SIZE]) override;
+    void markDanger(Square *board[BOARD_SIZE][BOARD_SIZE]) override;
 };
 
 /**
@@ -137,7 +140,7 @@ struct Rook : public Piece {
 public:
     explicit Rook(bool isWhite);
 
-    void markDanger(Square* board[BOARD_SIZE][BOARD_SIZE]) override;
+    void markDanger(Square *board[BOARD_SIZE][BOARD_SIZE]) override;
 };
 
 /**
@@ -148,7 +151,7 @@ struct Queen : public Piece {
 public:
     explicit Queen(bool isWhite);
 
-    void markDanger(Square* board[BOARD_SIZE][BOARD_SIZE]) override;
+    void markDanger(Square *board[BOARD_SIZE][BOARD_SIZE]) override;
 };
 
 

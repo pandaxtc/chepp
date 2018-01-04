@@ -27,25 +27,47 @@ SOFTWARE.
 
 Knight::Knight(bool isWhite) : Piece(isWhite, knight) {}
 
-void Knight::move(int x, int y, Square* board[BOARD_SIZE][BOARD_SIZE]) {
-    Square* cur = board[posY][posX];
-    if (x >= 0 && x < 8 && y >= 0 && y < 8) {
-        bool hasPiece = board[y][x]->hasPiece();
-        if (hasPiece && board[y][x]->getPiece()->isWhite != cur->getPiece()->isWhite) {
-            board[y][x]->inDangerFrom.insert(cur); //Mark square as in danger from original square
+/// Helper function
+bool Knight::checkKnightMove(int newX, int newY, Square *board[BOARD_SIZE][BOARD_SIZE]) {
+    Square *cur = board[posY][posX];
+    if (newX >= 0 && newX < 8 && newY >= 0 && newY < 8) {
+        bool hasPiece = board[newY][newX]->hasPiece();
+        if (hasPiece && board[newY][newX]->getPiece()->isWhite != cur->getPiece()->isWhite) {
+            return true; //Mark square as in danger from original square
         } else if (!hasPiece) {
-            board[y][x]->inDangerFrom.insert(cur);
+            return true;
+        } else {
+            return false;
         }
+    } else {
+        return false;
     }
 }
 
-void Knight::markDanger(Square* board[BOARD_SIZE][BOARD_SIZE]) {
-    move(posX + 1, posY + 2, board);
-    move(posX - 1, posY + 2, board);
-    move(posX - 2, posY + 1, board);
-    move(posX - 2, posY - 1, board);
-    move(posX - 1, posY - 2, board);
-    move(posX + 1, posY - 2, board);
-    move(posX + 2, posY - 1, board);
-    move(posX + 2, posY + 1, board);
+void Knight::markDanger(Square *board[BOARD_SIZE][BOARD_SIZE]) {
+    Square *cur = board[posY][posX];
+    if (checkKnightMove(posX + 1, posY + 2, board)) {
+        board[posX + 1][posY + 2]->inDangerFrom.insert(cur);
+    }
+    if (checkKnightMove(posX - 1, posY + 2, board)) {
+        board[posX -1][posY + 2]->inDangerFrom.insert(cur);
+    }
+    if (checkKnightMove(posX - 2, posY + 1, board)) {
+        board[posX - 2][posY + 1]->inDangerFrom.insert(cur);
+    }
+    if (checkKnightMove(posX - 2, posY - 1, board)) {
+        board[posX + 1][posY + 2]->inDangerFrom.insert(cur);
+    }
+    if (checkKnightMove(posX - 1, posY - 2, board)) {
+        board[posX - 1][posY - 2]->inDangerFrom.insert(cur);
+    }
+    if (checkKnightMove(posX + 1, posY - 2, board)) {
+        board[posX + 1][posY - 2]->inDangerFrom.insert(cur);
+    }
+    if (checkKnightMove(posX + 2, posY - 1, board)) {
+        board[posX + 2][posY - 1]->inDangerFrom.insert(cur);
+    }
+    if (checkKnightMove(posX + 2, posY + 1, board)) {
+        board[posX + 2][posY + 1]->inDangerFrom.insert(cur);
+    }
 }
