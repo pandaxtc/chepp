@@ -48,7 +48,7 @@ int main() {
 
     ///Regex for move notation: <letter><number><spaces><optional '-'><spaces><letter><number>
     regex rgx1(R"(^([a-hA-H][1-8])\s*-?\s*([a-hA-H][1-8])\s*$)");
-    regex rgx2(R"(^([Q,R,B,K,q,r,b,k])");
+    regex rgx2("[Q,R,B,K,q,r,b,k]");
 
     //Primary game loop
     while (true) {

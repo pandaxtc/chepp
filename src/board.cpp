@@ -67,11 +67,11 @@ void Board::initBoard() {
     for (Square* p : p_squares[1]) {
         p->moveHere(new Pawn(IS_WHITE));
     }
+
     for (Square* p : p_squares[6]) {
         p->moveHere(new Pawn(IS_BLACK));
     }
     // Populate other pieces
-    /*
     p_squares[0][0]->moveHere(new Rook(IS_WHITE));
     p_squares[0][1]->moveHere(new Knight(IS_WHITE));
     p_squares[0][2]->moveHere(new Bishop(IS_WHITE));
@@ -89,8 +89,7 @@ void Board::initBoard() {
     p_squares[7][5]->moveHere(new Bishop(IS_BLACK));
     p_squares[7][6]->moveHere(new Knight(IS_BLACK));
     p_squares[7][7]->moveHere(new Rook(IS_BLACK));
-    */
-    p_squares[6][0]->moveHere(new Pawn(IS_WHITE));
+
 }
 
 void Board::updateDanger() { // Update board danger markers
@@ -173,6 +172,7 @@ Square* Board::isCheckmate() {
             return nullptr;
         }
     }
+    return nullptr;
 }
 
 bool Board::canPromote(bool isWhiteTurn) {

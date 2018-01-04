@@ -35,10 +35,10 @@ void Pawn::markDanger(Square* board[BOARD_SIZE][BOARD_SIZE]) {
     //If forwards square is empty, mark square as in danger from cur
     if (!board[posY + dir][posX]->hasPiece()) {
         board[posY + dir][posX]->inDangerFrom.insert(cur);
-    }
-    //If is first move and 2 spaces forwards are both empty, mark square 2 spaces forwards as in danger from cur
-    if (firstMove && !board[posY + dir][posX]->hasPiece() && !board[posY + dir * 2][posX]->hasPiece()) {
-        board[posY + dir * 2][posX]->inDangerFrom.insert(cur); // Mark square as in danger from cur
+        //If is first move and 2 spaces forwards are both empty, mark square 2 spaces forwards as in danger from cur
+        if (posY + dir * 2 < 8 && posY + dir * 2 >= 0 && !board[posY + dir * 2][posX]->hasPiece()) {
+            board[posY + dir * 2][posX]->inDangerFrom.insert(cur); // Mark square as in danger from cur
+        }
     }
     //If front left has enemy piece, mark square as in danger from cur
     if (posX != BOARD_SIZE - 1 && board[posY + dir][posX + 1]->hasPiece() &&
