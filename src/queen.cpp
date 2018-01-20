@@ -57,6 +57,7 @@ void Queen::markDanger(Square* board[BOARD_SIZE][BOARD_SIZE]) {
             }
             break; // Stop iteration
         }
+        tmp->inDangerFrom.insert(cur);
     }
     tmpX = posX; // Reset position variables
     tmpY = posY;
@@ -70,6 +71,7 @@ void Queen::markDanger(Square* board[BOARD_SIZE][BOARD_SIZE]) {
             }
             break;
         }
+        tmp->inDangerFrom.insert(cur);
     }
     tmpX = posX;
     tmpY = posY;
@@ -83,6 +85,7 @@ void Queen::markDanger(Square* board[BOARD_SIZE][BOARD_SIZE]) {
             }
             break;
         }
+        tmp->inDangerFrom.insert(cur);
     }
     tmpX = posX;
     tmpY = posY;
@@ -96,6 +99,7 @@ void Queen::markDanger(Square* board[BOARD_SIZE][BOARD_SIZE]) {
             }
             break;
         }
+        tmp->inDangerFrom.insert(cur);
     }
     tmpX = posX;
     tmpY = posY;
