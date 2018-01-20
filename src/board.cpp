@@ -33,7 +33,7 @@ Square::Square(int posX, int posY) : posX(posX), posY(posY) {
     m_piece = nullptr;
 };
 
-void Square::moveHere(Piece* piece) {
+void Square::moveHere(Piece *piece) {
     m_piece = piece;
     if (m_piece != nullptr) {
         m_piece->posY = posY;
@@ -41,7 +41,7 @@ void Square::moveHere(Piece* piece) {
     }
 }
 
-Piece* Square::getPiece() {
+Piece *Square::getPiece() {
     return m_piece;
 }
 
@@ -64,11 +64,10 @@ void Board::initBoard() {
     }
     // Hardcoded.
     // Populate pawn starting positions
-    for (Square* p : p_squares[1]) {
+    for (Square *p : p_squares[1]) {
         p->moveHere(new Pawn(IS_WHITE));
     }
-
-    for (Square* p : p_squares[6]) {
+    for (Square *p : p_squares[6]) {
         p->moveHere(new Pawn(IS_BLACK));
     }
     // Populate other pieces
@@ -89,7 +88,6 @@ void Board::initBoard() {
     p_squares[7][5]->moveHere(new Bishop(IS_BLACK));
     p_squares[7][6]->moveHere(new Knight(IS_BLACK));
     p_squares[7][7]->moveHere(new Rook(IS_BLACK));
-
 }
 
 void Board::updateDanger() { // Update board danger markers
@@ -101,11 +99,11 @@ void Board::updateDanger() { // Update board danger markers
 
     // Iterate over all pieces and populate danger markers. Non-king pieces go first.
     // i: y, j: x
-    unordered_set<Square*> kings;
+    unordered_set<Square *> kings;
     for (auto &row : p_squares) {
         for (auto &square : row) {
             if (square->hasPiece()) {
-                Piece* p = square->getPiece();
+                Piece *p = square->getPiece();
                 if (p->type != king) {
                     p->markDanger(p_squares);
                 } else if (p->type == king) {
@@ -122,58 +120,72 @@ void Board::updateDanger() { // Update board danger markers
 bool Board::move(int posX, int posY, int newX, int newY) {
     if (p_squares[newY][newX]->inDangerFrom.count(p_squares[posY][posX]) == 0) {
         return false;
+    } else if (inCheck()) {
+        return false;
     } else {
         if (p_squares[newY][newX]->hasPiece()) {
             p_takenPieces.insert(p_squares[newY][newX]->getPiece());
         }
         p_squares[newY][newX]->moveHere(p_squares[posY][posX]->getPiece());
         p_squares[posY][posX]->moveHere(nullptr);
+        p_squares[newY][newX]->getPiece()->firstMove = false;
         return true;
     }
 }
 
-Square* Board::isCheckmate() {
-    unordered_set<Square*> kings;
+bool Board::castle(bool isWhiteTurn, bool kingSide) {
+    Square *king = nullptr;
     for (auto &row : p_squares) {
         for (auto &square : row) {
-            if (square->hasPiece() && square->getPiece()->type == king) {
-                kings.insert(square);
+            if (square->hasPiece()) {
+                if (square->getPiece()->type == piece_t::king && square->getPiece()->isWhite == isWhiteTurn) {
+                    king = square;
+                    break;
+                }
             }
         }
     }
 
-    for (auto &king : kings) {
-        bool inCheck = false; // Whether or not the King is in check & checking pieces are not in danger
-        bool canMove = false;
-        for (auto &row : p_squares) {
-            for (auto &square : row) {
-                for (Square* s : square->inDangerFrom) {
-                    if (s == king) canMove = true;
-                }
-            }
-        }
-
-        for (auto &danger : king->inDangerFrom) {
-            if (danger->getPiece()->isWhite != king->getPiece()->isWhite) {
-                bool inDanger = false;
-                for (auto &saviour : danger->inDangerFrom) {
-                    if (saviour->getPiece()->isWhite == king->getPiece()->isWhite) {
-                        inDanger = true;
-                    }
-                }
-                if (!inDanger) { // If even a single checking piece is safe, the checkmate requirements are fulfilled
-                    inCheck = true;
-                }
-            }
-        }
-        if (inCheck && !canMove) {
-            return king;
-        } else {
-            return nullptr;
+    bool inCheck = false;
+    for (auto *s : king->inDangerFrom) {
+        if (s->getPiece()->isWhite != king->getPiece()->isWhite) {
+            inCheck = true;
         }
     }
-    return nullptr;
+
+    if (king && king->getPiece()->firstMove && !inCheck) {
+        int kingX = king->posX;
+        int kingY = king->posY;
+        if (kingSide && p_squares[kingY][BOARD_SIZE - 1]->hasPiece() &&
+            p_squares[kingY][BOARD_SIZE - 1]->getPiece()->type == rook &&
+            p_squares[kingY][BOARD_SIZE - 1]->getPiece()->firstMove) {
+            for (int posX = kingX + 1; posX < BOARD_SIZE - 1; posX++) {
+                if (p_squares[kingY][posX]->hasPiece()) {
+                    return false;
+                }
+            }
+            Piece *cRook = p_squares[kingY][BOARD_SIZE - 1]->getPiece();
+            p_squares[kingY][BOARD_SIZE - 1]->moveHere(king->getPiece());
+            p_squares[kingY][kingX]->moveHere(cRook);
+        }
+        if (kingSide && p_squares[kingY][0]->hasPiece() &&
+            p_squares[kingY][0]->getPiece()->type == rook &&
+            p_squares[kingY][0]->getPiece()->firstMove) {
+            for (int posX = kingX - 1; posX > 0; posX--) {
+                if (p_squares[kingY][posX]->hasPiece()) {
+                    return false;
+                }
+            }
+            Piece *cRook = p_squares[kingY][0]->getPiece();
+            p_squares[kingY][0]->moveHere(king->getPiece());
+            p_squares[kingY][kingX]->moveHere(cRook);
+        }
+
+    } else {
+        return false;
+    }
 }
+
 
 bool Board::canPromote(bool isWhiteTurn) {
     if (isWhiteTurn) {
@@ -207,5 +219,69 @@ void Board::promote(int posX, int posY, int input) {
         case ('k') :
             p_squares[posY][posX]->moveHere(new Knight(isWhite));
             break;
+        default:
+            break;
     }
+}
+
+Square *Board::inCheckmate() {
+    unordered_set<Square *> kings;
+    for (auto &row : p_squares) {
+        for (auto &square : row) {
+            if (square->hasPiece() && square->getPiece()->type == king) {
+                kings.insert(square);
+            }
+        }
+    }
+    for (auto &king : kings) {
+        bool inDefiniteCheck = false; // Whether or not the King is in check & checking pieces are not in danger
+        bool canMove = false;
+        for (auto &row : p_squares) {
+            for (auto &square : row) {
+                for (Square *s : square->inDangerFrom) {
+                    if (s == king) canMove = true;
+                }
+            }
+        }
+        for (auto &checkingPiece : king->inDangerFrom) {
+            if (checkingPiece->getPiece()->isWhite != king->getPiece()->isWhite) { // If enemy piece is checking king
+                bool checkingPieceIsSafe = true;
+                for (auto &saviour : checkingPiece->inDangerFrom) {
+                    if (saviour->getPiece()->isWhite == king->getPiece()->isWhite) { // If enemy piece is not in danger
+                        checkingPieceIsSafe = false;
+                    }
+                }
+                if (checkingPieceIsSafe) { // If even a single checking piece is safe, the checkmate requirements are fulfilled
+                    inDefiniteCheck = true;
+                }
+            }
+        }
+        if (inDefiniteCheck && !canMove) { // If the king is in undeniable check and cannot move, return pointer to it.
+            return king;
+        }
+    }
+    return nullptr; // If no kings are in checkmate, return nullptr.
+}
+
+Square *Board::inCheck() {
+    unordered_set<Square *> kings;
+    for (auto &row : p_squares) {
+        for (auto &square : row) {
+            if (square->hasPiece() && square->getPiece()->type == king) {
+                kings.insert(square);
+            }
+        }
+    }
+    for (auto &king : kings) {
+        bool inCheck = false;
+        for (auto &checkingPiece : king->inDangerFrom) {
+            if (checkingPiece->getPiece()->isWhite != king->getPiece()->isWhite) { // If enemy piece is checking king
+                inCheck = true;
+            }
+        }
+        if (inCheck) {
+            return king;
+        }
+    }
+    return nullptr;
 }

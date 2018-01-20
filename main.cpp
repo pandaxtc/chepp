@@ -47,8 +47,8 @@ int main() {
     bool isWhiteTurn = false;
 
     ///Regex for move notation: <letter><number><spaces><optional '-'><spaces><letter><number>
-    regex rgx1(R"(^([a-hA-H][1-8])\s*-?\s*([a-hA-H][1-8])\s*$)");
-    regex rgx2("[Q,R,B,K,q,r,b,k]");
+    regex moveRgx(R"(^([a-hA-H][1-8])\s*-?\s*([a-hA-H][1-8])\s*$)");
+    regex promotionRgx(R"(^\s*([Q,R,B,K,q,r,b,k])\s*$)");
 
     //Primary game loop
     while (true) {
@@ -60,67 +60,65 @@ int main() {
 
         //Check for input validity
         bool isValid = false;
-        //declared newX and NewY outside to make promotion easier
-        int newX = 0;
-        int newY = 0;
         while (!isValid) {
-            Square* p = board->isCheckmate(); // Check for checkmate
-            if (p) {
-                cout << (p->getPiece()->isWhite ? "White" : "Black") << " checkmate! Game over.";
+            Square* pieceInCheckmate = board->inCheckmate(); // Check for checkmate
+            if (pieceInCheckmate) {
+                cout << (pieceInCheckmate->getPiece()->isWhite ? "White" : "Black") << " checkmate! Game over.";
                 exit(0); // Game over
             }
+            Square* pieceInCheck = board->inCheck();
+            if (pieceInCheck) {
+                cout << (pieceInCheck->getPiece()->isWhite ? "White" : "Black") << " king in check.";
+            }
             // Prompt user for input
-            cout << "> ";
+            cout << (isWhiteTurn ? "White" : "Black" ) << ">";
             cin >> input;
             // Semantic validity
-            cout << "RECEIVED INPUT " << input << endl;
-            cout << "TESTING SEMANTIC VALIDITY..." << endl;
-            smatch sm;
-            if (input == "exit") {
+            smatch moveMatch;
+            if (input == "exit" || input == "quit") {
                 exit(0);
-            } else if (!regex_match(input, sm, rgx1)) {
+            } else if (!regex_match(input, moveMatch, moveRgx)) {
                 cout << "Invalid input, please try again." << endl;
             } else {
-                cout << "SEMANTICALLY VALID!" << endl;
+                //cout << "SEMANTICALLY VALID!" << endl;
                 // Logical validity
-                cout << "TESTING LOGICAL VALIDITY..." << endl;
-                int posX = tolower(sm.str(1)[0]) - 'a';
-                int posY = tolower(sm.str(1)[1]) - '1';
-                newX = tolower(sm.str(2)[0]) - 'a';
-                newY = tolower(sm.str(2)[1]) - '1';
+                //cout << "TESTING LOGICAL VALIDITY..." << endl;
+                int posX = tolower(moveMatch.str(1)[0]) - 'a';
+                int posY = tolower(moveMatch.str(1)[1]) - '1';
+                int newX = tolower(moveMatch.str(2)[0]) - 'a';
+                int newY = tolower(moveMatch.str(2)[1]) - '1';
                 cout << posX << ", " << posY << endl;
                 cout << newX << ", " << newY << endl;
                 if (!board->p_squares[posY][posX]->hasPiece()) {
-                    cout << "No piece on square " << input.substr(0, 1) << ", please try again." << endl;
+                    cout << "No piece on square " << moveMatch.str(1) << ", please try again." << endl;
                 } else if (board->p_squares[posY][posX]->getPiece()->isWhite != isWhiteTurn) {
                     cout << "Incorrect piece color, please try again." << endl;
                 } else {
                     //Move validity
-                    cout << "LOGICALLY VALID!" << endl;
-                    cout << "TESTING MOVE VALIDITY..." << endl;
+                    //cout << "LOGICALLY VALID!" << endl;
+                    //cout << "TESTING MOVE VALIDITY..." << endl;
                     if (!board->move(posX, posY, newX, newY)) {
                         cout << "Invalid move, try again." << endl;
                     } else {
-                        cout << "MOVE VALID!" << endl;
+                        //cout << "MOVE VALID!" << endl;
                         isValid = true;
+                        if (board->canPromote(isWhiteTurn)) {
+                            cout << "Promote pawn at (" << newX << ", " << newY << ") to what piece?" << endl;
+                            cout << "(Q)ueen (R)ook (B)ishop (K)night" << endl;
+                            cin >> input;
+                            smatch promotionMatch;
+                            while (!regex_match(input, promotionMatch, promotionRgx)) {
+                                cout << "Invalid input, please try again." << endl;
+                                cin >> input;
+                            }
+                            board->promote(newX, newY, tolower(promotionMatch.str(1)[0]));
+                        }
                     }
                 }
             }
         }
-        if (board->canPromote(isWhiteTurn)) {
-            cout << "Promote to what piece?" << endl;
-            cout << "(Q)ueen (R)ook (B)ishop (K)night" << endl;
-            cin >> input;
-            while (!regex_match(input, rgx2)) {
-                cout << "Invalid input, please try again." << endl;
-                cin >> input;
-            }
-            board->promote(newX, newY, tolower(input[0]));
-        }
         board->updateDanger();
-
     }
-
 }
 
 /**
@@ -142,52 +140,53 @@ void printBoard(Board* board) {
                 if (cur->getPiece()->isWhite) {
                     switch (type) {
                         case pawn :
-                            cout << "♟";
+                            cout << "P ";
                             break;
                         case rook :
-                            cout << "♜";
+                            cout << "R ";
                             break;
                         case knight :
-                            cout << "♞";
+                            cout << "N ";
                             break;
                         case bishop :
-                            cout << "♝";
+                            cout << "B ";
                             break;
                         case queen :
-                            cout << "♛";
+                            cout << "Q ";
                             break;
                         case king :
-                            cout << "♚";
+                            cout << "K ";
                             break;
                     }
                 } else {
                     switch (type) {
                         case pawn :
-                            cout << "♙";
+                            cout << "p ";
                             break;
                         case rook :
-                            cout << "♖";
+                            cout << "r ";
                             break;
                         case knight :
-                            cout << "♘";
+                            cout << "n ";
                             break;
                         case bishop :
-                            cout << "♗";
+                            cout << "b ";
                             break;
                         case queen :
-                            cout << "♕";
+                            cout << "q ";
                             break;
                         case king :
-                            cout << "♔";
+                            cout << "k ";
                             break;
                     }
                 }
             } else {
-                cout << "\u2001";
+                cout << "  ";
             }
         }
         cout << endl;
     }
+    cout << "  a b c d e f g h " << endl;
     printDanger(board);
 }
 

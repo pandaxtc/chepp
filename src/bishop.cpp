@@ -25,7 +25,7 @@ SOFTWARE.
 #include "piece.h"
 #include "board.h"
 
-Bishop::Bishop(bool isWhite) : Piece(isWhite, rook) {}
+Bishop::Bishop(bool isWhite) : Piece(isWhite, bishop) {}
 
 /**
  * @brief Given board state, mark all squares that the piece is capable of moving to.

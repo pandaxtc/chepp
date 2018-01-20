@@ -38,18 +38,18 @@ struct Square {
 public:
     const int posX;
     const int posY;
-    unordered_set<Square*> inDangerFrom;
+    unordered_set<Square *> inDangerFrom;
 
     Square(int posX, int posY);
 
-    void moveHere(Piece* piece);
+    void moveHere(Piece *piece);
 
-    Piece* getPiece();
+    Piece *getPiece();
 
     bool hasPiece();
 
 private:
-    Piece* m_piece = nullptr;
+    Piece *m_piece = nullptr;
 };
 
 class Board {
@@ -61,8 +61,8 @@ public:
      * 2D array of Square pointers that represents the game board. Lower-left corner is (0,0).
      *
      */
-    Square* p_squares[BOARD_SIZE][BOARD_SIZE];
-    unordered_set<Piece*> p_takenPieces;
+    Square *p_squares[BOARD_SIZE][BOARD_SIZE];
+    unordered_set<Piece *> p_takenPieces;
 
     Board();
 
@@ -70,15 +70,17 @@ public:
 
     void updateDanger();
 
+    bool move(int posX, int posY, int newX, int newY);
+
+    bool castle(bool isWhiteTurn, bool kingSide);
+
     bool canPromote(bool isWhiteTurn);
 
     void promote(int posX, int posY, int input);
 
-    bool move(int posX, int posY, int newX, int newY);
+    Square *inCheckmate();
 
-
-
-    Square* isCheckmate();
+    Square *inCheck();
 };
 
 
