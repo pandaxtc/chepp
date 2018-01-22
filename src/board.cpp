@@ -81,9 +81,9 @@ void Board::initBoard() {
     p_squares[0][7]->moveHere(new Rook(IS_WHITE));
 
     p_squares[7][0]->moveHere(new Rook(IS_BLACK));
-    p_squares[7][1]->moveHere(new Knight(IS_BLACK));
-    p_squares[7][2]->moveHere(new Bishop(IS_BLACK));
-    p_squares[7][3]->moveHere(new Queen(IS_BLACK));
+    //p_squares[7][1]->moveHere(new Knight(IS_BLACK));
+    //p_squares[7][2]->moveHere(new Bishop(IS_BLACK));
+    //p_squares[7][3]->moveHere(new Queen(IS_BLACK));
     p_squares[7][4]->moveHere(new King(IS_BLACK));
     p_squares[7][5]->moveHere(new Bishop(IS_BLACK));
     p_squares[7][6]->moveHere(new Knight(IS_BLACK));
@@ -120,15 +120,43 @@ void Board::updateDanger() { // Update board danger markers
 bool Board::move(int posX, int posY, int newX, int newY) {
     if (p_squares[newY][newX]->inDangerFrom.count(p_squares[posY][posX]) == 0) {
         return false;
-    } else if (inCheck()) {
-        return false;
     } else {
+        Piece* taken = nullptr;
         if (p_squares[newY][newX]->hasPiece()) {
-            p_takenPieces.insert(p_squares[newY][newX]->getPiece());
+            taken = p_squares[newY][newX]->getPiece();
+            p_takenPieces.insert(taken);
         }
         p_squares[newY][newX]->moveHere(p_squares[posY][posX]->getPiece());
         p_squares[posY][posX]->moveHere(nullptr);
-        p_squares[newY][newX]->getPiece()->firstMove = false;
+
+        updateDanger();
+
+        Square* king = nullptr;
+        for (auto &row : p_squares) { // Find king
+            for (auto &square : row) {
+                if (square->hasPiece() &&
+                    square->getPiece()->type == piece_t::king &&
+                    square->getPiece()->isWhite == p_squares[newY][newX]->getPiece()->isWhite) {
+                    king = square;
+                }
+            }
+        }
+
+        bool isInCheck = false;
+        if (king != nullptr) { // Check if king is in check
+            for (auto &s : king->inDangerFrom) {
+                if (s->getPiece()->isWhite != king->getPiece()->isWhite) {
+                    isInCheck = true;
+                }
+            }
+        }
+
+        if (isInCheck) { // If king still in check after move, invalidate move
+            p_squares[posY][posX]->moveHere(p_squares[newY][newX]->getPiece());
+            p_squares[newY][newX]->moveHere(taken);
+            return true;
+        }
+
         return true;
     }
 }
@@ -144,6 +172,9 @@ bool Board::castle(bool isWhiteTurn, bool kingSide) {
                 }
             }
         }
+        if (king != nullptr) {
+            break;
+        }
     }
 
     bool inCheck = false;
@@ -153,7 +184,7 @@ bool Board::castle(bool isWhiteTurn, bool kingSide) {
         }
     }
 
-    if (king && king->getPiece()->firstMove && !inCheck) {
+    if (king != nullptr && king->getPiece()->firstMove && !inCheck) {
         int kingX = king->posX;
         int kingY = king->posY;
         if (kingSide && p_squares[kingY][BOARD_SIZE - 1]->hasPiece() &&
@@ -163,22 +194,39 @@ bool Board::castle(bool isWhiteTurn, bool kingSide) {
                 if (p_squares[kingY][posX]->hasPiece()) {
                     return false;
                 }
+                else {
+                    for (auto *s : p_squares[kingY][posX]->inDangerFrom) {
+                        if (s->getPiece()->isWhite != isWhiteTurn) {
+                            return false;
+                        }
+                    }
+                }
             }
-            Piece *cRook = p_squares[kingY][BOARD_SIZE - 1]->getPiece();
-            p_squares[kingY][BOARD_SIZE - 1]->moveHere(king->getPiece());
-            p_squares[kingY][kingX]->moveHere(cRook);
-        }
-        if (kingSide && p_squares[kingY][0]->hasPiece() &&
-            p_squares[kingY][0]->getPiece()->type == rook &&
-            p_squares[kingY][0]->getPiece()->firstMove) {
+            p_squares[kingY][kingX + 2]->moveHere(king->getPiece());
+            p_squares[kingY][kingX]->moveHere(nullptr);
+            p_squares[kingY][kingX + 1]->moveHere(p_squares[kingY][BOARD_SIZE - 1]->getPiece());
+            p_squares[kingY][BOARD_SIZE - 1]->moveHere(nullptr);
+            return true;
+        } else if (!kingSide && p_squares[kingY][0]->hasPiece() &&
+                   p_squares[kingY][0]->getPiece()->type == rook &&
+                   p_squares[kingY][0]->getPiece()->firstMove) {
             for (int posX = kingX - 1; posX > 0; posX--) {
                 if (p_squares[kingY][posX]->hasPiece()) {
                     return false;
                 }
+                else {
+                    for (auto *s : p_squares[kingY][posX]->inDangerFrom) {
+                        if (s->getPiece()->isWhite != isWhiteTurn) {
+                            return false;
+                        }
+                    }
+                }
             }
-            Piece *cRook = p_squares[kingY][0]->getPiece();
-            p_squares[kingY][0]->moveHere(king->getPiece());
-            p_squares[kingY][kingX]->moveHere(cRook);
+            p_squares[kingY][kingX - 3]->moveHere(king->getPiece());
+            p_squares[kingY][kingX]->moveHere(nullptr);
+            p_squares[kingY][kingX - 2]->moveHere(p_squares[kingY][0]->getPiece());
+            p_squares[kingY][0]->moveHere(nullptr);
+            return true;
         }
 
     } else {
@@ -222,6 +270,7 @@ void Board::promote(int posX, int posY, int input) {
         default:
             break;
     }
+    updateDanger();
 }
 
 Square *Board::inCheckmate() {

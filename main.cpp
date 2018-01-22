@@ -36,18 +36,17 @@ SOFTWARE.
 
 using namespace std;
 
-void printBoard(Board* board);
-
-void printDanger(Board* board);
+void printBoard(Board *board);
 
 ///Controls operation of the game
 int main() {
     ///Game board
-    auto* board = new Board();
+    auto *board = new Board();
     bool isWhiteTurn = false;
 
     ///Regex for move notation: <letter><number><spaces><optional '-'><spaces><letter><number>
-    regex moveRgx(R"(^([a-hA-H][1-8])\s*-?\s*([a-hA-H][1-8])\s*$)");
+    regex moveRgx(R"(^\s*([a-h][1-8])\s*-?\s*([a-h][1-8])\s*$)", regex::icase);
+    regex castleRgx(R"(^\s*castle\s*(k|q)\s*$)");
     regex promotionRgx(R"(^\s*([Q,R,B,K,q,r,b,k])\s*$)");
 
     //Primary game loop
@@ -61,28 +60,36 @@ int main() {
         //Check for input validity
         bool isValid = false;
         while (!isValid) {
-            Square* pieceInCheckmate = board->inCheckmate(); // Check for checkmate
+            Square *pieceInCheckmate = board->inCheckmate(); // Check for checkmate
             if (pieceInCheckmate) {
                 cout << (pieceInCheckmate->getPiece()->isWhite ? "White" : "Black") << " checkmate! Game over.";
                 exit(0); // Game over
             }
-            Square* pieceInCheck = board->inCheck();
+            Square *pieceInCheck = board->inCheck();
             if (pieceInCheck) {
-                cout << (pieceInCheck->getPiece()->isWhite ? "White" : "Black") << " king in check.";
+                cout << (pieceInCheck->getPiece()->isWhite ? "White" : "Black") << " king in check!";
             }
             // Prompt user for input
-            cout << (isWhiteTurn ? "White" : "Black" ) << ">";
-            cin >> input;
+            cout << (isWhiteTurn ? "White" : "Black") << "> ";
+            getline(cin, input);
             // Semantic validity
             smatch moveMatch;
+            smatch castleMatch;
             if (input == "exit" || input == "quit") {
                 exit(0);
-            } else if (!regex_match(input, moveMatch, moveRgx)) {
-                cout << "Invalid input, please try again." << endl;
+            } else if (!regex_match(input, moveMatch, moveRgx)) { // If move regex does not match
+                if (regex_match(input, castleMatch, castleRgx)) { // If castle regex matches
+                    cout << castleMatch.str(0);
+                    if (!board->castle(isWhiteTurn, castleMatch.str(1)[0] == 'k')) { // If castle is invalid
+                        cout << "Invalid move, please try again." << endl;
+                    } else { //Else if castle valid
+                        isValid = true; // Move was valid
+                    }
+                } else { // If castle regex does not match
+                    cout << "Invalid input, please try again." << endl; // No regexes matched
+                }
             } else {
-                //cout << "SEMANTICALLY VALID!" << endl;
                 // Logical validity
-                //cout << "TESTING LOGICAL VALIDITY..." << endl;
                 int posX = tolower(moveMatch.str(1)[0]) - 'a';
                 int posY = tolower(moveMatch.str(1)[1]) - '1';
                 int newX = tolower(moveMatch.str(2)[0]) - 'a';
@@ -95,16 +102,14 @@ int main() {
                     cout << "Incorrect piece color, please try again." << endl;
                 } else {
                     //Move validity
-                    //cout << "LOGICALLY VALID!" << endl;
-                    //cout << "TESTING MOVE VALIDITY..." << endl;
                     if (!board->move(posX, posY, newX, newY)) {
                         cout << "Invalid move, try again." << endl;
                     } else {
-                        //cout << "MOVE VALID!" << endl;
                         isValid = true;
                         if (board->canPromote(isWhiteTurn)) {
                             cout << "Promote pawn at (" << newX << ", " << newY << ") to what piece?" << endl;
                             cout << "(Q)ueen (R)ook (B)ishop (K)night" << endl;
+                            cout << (isWhiteTurn ? "White" : "Black") << ">";
                             cin >> input;
                             smatch promotionMatch;
                             while (!regex_match(input, promotionMatch, promotionRgx)) {
@@ -117,7 +122,6 @@ int main() {
                 }
             }
         }
-        board->updateDanger();
     }
 }
 
@@ -128,13 +132,13 @@ int main() {
  * Loops through the board and prints chess piece characters depending on piece type.
  *
  */
-void printBoard(Board* board) {
+void printBoard(Board *board) {
     int start = BOARD_SIZE;
     for (int i = BOARD_SIZE - 1; i >= 0; i--) {
         cout << start-- << " ";
         for (auto &j : board->p_squares[i]) {
             if (j->hasPiece()) {
-                Square* cur = j;
+                Square *cur = j;
                 piece_t type = cur->getPiece()->type;
 
                 if (cur->getPiece()->isWhite) {
@@ -187,24 +191,6 @@ void printBoard(Board* board) {
         cout << endl;
     }
     cout << "  a b c d e f g h " << endl;
-    printDanger(board);
 }
 
-
-//Outputs danger
-void printDanger(Board* board)
-{
-    for (int i = BOARD_SIZE - 1; i >= 0; i--)
-    {
-        for (auto &j : board->p_squares[i])
-        {
-            Square* cur = j;
-            bool inDanger = (!cur->inDangerFrom.empty());
-            if (inDanger) {
-                cout << "x ";
-            } else cout << "o ";
-        }
-        cout << endl;
-    }
-}
 
