@@ -38,6 +38,8 @@ using namespace std;
 
 void printBoard(Board *board);
 
+void printDanger(Board* board);
+
 ///Controls operation of the game
 int main() {
     ///Game board
@@ -94,8 +96,8 @@ int main() {
                 int posY = tolower(moveMatch.str(1)[1]) - '1';
                 int newX = tolower(moveMatch.str(2)[0]) - 'a';
                 int newY = tolower(moveMatch.str(2)[1]) - '1';
-                cout << posX << ", " << posY << endl;
-                cout << newX << ", " << newY << endl;
+                //cout << posX << ", " << posY << endl;
+                //cout << newX << ", " << newY << endl;
                 if (!board->p_squares[posY][posX]->hasPiece()) {
                     cout << "No piece on square " << moveMatch.str(1) << ", please try again." << endl;
                 } else if (board->p_squares[posY][posX]->getPiece()->isWhite != isWhiteTurn) {
@@ -191,6 +193,23 @@ void printBoard(Board *board) {
         cout << endl;
     }
     cout << "  a b c d e f g h " << endl;
+    //printDanger(board);
 }
 
 
+//Outputs danger
+void printDanger(Board* board)
+{
+    for (int i = BOARD_SIZE - 1; i >= 0; i--)
+    {
+        for (auto &j : board->p_squares[i])
+        {
+            Square* cur = j;
+            bool inDanger = (!cur->inDangerFrom.empty());
+            if (inDanger) {
+                cout << "x ";
+            } else cout << "o ";
+        }
+        cout << endl;
+    }
+}

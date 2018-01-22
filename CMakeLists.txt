@@ -18,3 +18,4 @@ set(SOURCE_FILES
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 add_executable(chepp main.cpp ${SOURCE_FILES})
+target_link_libraries(chepp -static-libgcc -static-libstdc++)

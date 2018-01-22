@@ -81,9 +81,9 @@ void Board::initBoard() {
     p_squares[0][7]->moveHere(new Rook(IS_WHITE));
 
     p_squares[7][0]->moveHere(new Rook(IS_BLACK));
-    //p_squares[7][1]->moveHere(new Knight(IS_BLACK));
-    //p_squares[7][2]->moveHere(new Bishop(IS_BLACK));
-    //p_squares[7][3]->moveHere(new Queen(IS_BLACK));
+    p_squares[7][1]->moveHere(new Knight(IS_BLACK));
+    p_squares[7][2]->moveHere(new Bishop(IS_BLACK));
+    p_squares[7][3]->moveHere(new Queen(IS_BLACK));
     p_squares[7][4]->moveHere(new King(IS_BLACK));
     p_squares[7][5]->moveHere(new Bishop(IS_BLACK));
     p_squares[7][6]->moveHere(new Knight(IS_BLACK));
@@ -123,8 +123,7 @@ bool Board::move(int posX, int posY, int newX, int newY) {
     } else {
         Piece* taken = nullptr;
         if (p_squares[newY][newX]->hasPiece()) {
-            taken = p_squares[newY][newX]->getPiece();
-            p_takenPieces.insert(taken);
+            p_takenPieces.insert(p_squares[newY][newX]->getPiece());
         }
         p_squares[newY][newX]->moveHere(p_squares[posY][posX]->getPiece());
         p_squares[posY][posX]->moveHere(nullptr);
@@ -233,7 +232,6 @@ bool Board::castle(bool isWhiteTurn, bool kingSide) {
         return false;
     }
 }
-
 
 bool Board::canPromote(bool isWhiteTurn) {
     if (isWhiteTurn) {
