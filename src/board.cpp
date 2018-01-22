@@ -154,7 +154,8 @@ bool Board::move(int posX, int posY, int newX, int newY) {
         if (isInCheck) { // If king still in check after move, invalidate move
             p_squares[posY][posX]->moveHere(p_squares[newY][newX]->getPiece());
             p_squares[newY][newX]->moveHere(taken);
-            return true;
+            updateDanger();
+            return false;
         }
 
         return true;
