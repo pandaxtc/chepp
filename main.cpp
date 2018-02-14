@@ -81,7 +81,6 @@ int main() {
                 exit(0);
             } else if (!regex_match(input, moveMatch, moveRgx)) { // If move regex does not match
                 if (regex_match(input, castleMatch, castleRgx)) { // If castle regex matches
-                    cout << castleMatch.str(0);
                     if (!board->castle(isWhiteTurn, castleMatch.str(1)[0] == 'k')) { // If castle is invalid
                         cout << "Invalid move, please try again." << endl;
                     } else { //Else if castle valid
